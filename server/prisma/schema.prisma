@@ -1,0 +1,70 @@
+// schema.prisma
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  username       String
+  email          String?   @unique
+  hashedPassword String?   // Nullable to allow social logins
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  accounts       Account[] // Linked OAuth/social accounts
+}
+
+model Account {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @db.ObjectId
+  user              User     @relation(fields: [userId], references: [id])
+
+  provider          String   // 'google', 'github', etc.
+  providerAccountId String   // The user ID from the provider
+  accessToken       String?  // Optional
+  refreshToken      String?  // Optional
+  expiresAt         Int?     // Timestamp (epoch)
+  tokenType         String?  // Optional
+  scope             String?  // Optional
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([provider, providerAccountId]) // One account per provider/user combo
+}
+model Quiz {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?    // Optional field
+  questions   Question[] @relation("QuizQuestions")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Question {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  text          String
+  options       String[]
+  correctAnswer String
+
+  // Relations
+  quizId        String   @db.ObjectId
+  quiz          Quiz     @relation("QuizQuestions", fields: [quizId], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Announcement {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
