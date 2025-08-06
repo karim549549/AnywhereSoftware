@@ -13,7 +13,36 @@
   "Auth": {
     "login": "تسجيل الدخول",
     "logout": "تسجيل الخروج",
-    "register": "تسجيل"
+    "register": "تسجيل",
+    "registerWithGoogle": "التسجيل باستخدام جوجل",
+    "registerWithGitHub": "التسجيل باستخدام جيت هاب",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "LoginForm": {
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "passwordRules": {
+        "title": "يجب أن تحتوي كلمة المرور على:",
+        "length": "8 أحرف على الأقل",
+        "lowercase": "حرف صغير واحد على الأقل",
+        "uppercase": "حرف كبير واحد على الأقل",
+        "number": "رقم واحد على الأقل"
+      },
+      "signIn": "تسجيل الدخول"
+    },
+    "RegisterForm": {
+      "email": "البريد الإلكتروني",
+      "username": "اسم المستخدم",
+      "password": "كلمة المرور",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "passwordRules": {
+        "title": "يجب أن تحتوي كلمة المرور على:",
+        "length": "8 أحرف على الأقل",
+        "lowercase": "حرف صغير واحد على الأقل",
+        "uppercase": "حرف كبير واحد على الأقل",
+        "number": "رقم واحد على الأقل"
+      },
+      "signUp": "تسجيل"
+    }
   },
   "DashboardPage": {
     "dashboard": "لوحة التحكم",

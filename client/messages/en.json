@@ -13,7 +13,36 @@
   "Auth": {
     "login": "Login",
     "logout": "Logout",
-    "register": "Register"
+    "register": "Register",
+    "registerWithGoogle": "Register with Google",
+    "registerWithGitHub": "Register with GitHub",
+    "alreadyHaveAccount": "Already have an account?",
+    "LoginForm": {
+      "email": "Email Address",
+      "password": "Password",
+      "passwordRules": {
+        "title": "Password must contain:",
+        "length": "At least 8 characters",
+        "lowercase": "At least one lowercase letter",
+        "uppercase": "At least one uppercase letter",
+        "number": "At least one number"
+      },
+      "signIn": "Sign In"
+    },
+    "RegisterForm": {
+      "email": "Email Address",
+      "username": "Username",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "passwordRules": {
+        "title": "Password must contain:",
+        "length": "At least 8 characters",
+        "lowercase": "At least one lowercase letter",
+        "uppercase": "At least one uppercase letter",
+        "number": "At least one number"
+      },
+      "signUp": "Sign Up"
+    }
   },
   "DashboardPage": {
     "dashboard": "Dashboard",
