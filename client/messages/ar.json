@@ -1,0 +1,38 @@
+{
+  "HomePage": {
+    "welcome": "أهلاً بك في Anywhere Software!",
+    "tagline": "منصتك الأمثل لاختبارات الطلاب والإعلانات.",
+    "description": "ابقَ على اطلاع بآخر الإعلانات واختبر معلوماتك من خلال الاختبارات التفاعلية المصممة للفصل الدراسي الحالي.",
+    "getStarted": "ابدأ الآن",
+    "learnMore": "تعلم المزيد",
+    "examTimeTitle": "وقت الامتحان",
+    "examTimeText1": "ها نحن هنا. هل أنت مستعد للقتال؟ لا تقلق، لقد أعددنا بعض النصائح لتكون جاهزًا لامتحانك.",
+    "examTimeQuote": "\"الطريقة الوحيدة للقيام بعمل عظيم هي أن تحب ما تفعله.\"",
+    "viewExamTips": "عرض نصائح الامتحان"
+  },
+  "Auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "تسجيل"
+  },
+  "DashboardPage": {
+    "dashboard": "لوحة التحكم",
+    "announcements": "الإعلانات",
+    "quizzes": "الاختبارات",
+    "schedule": "الجدول",
+    "courses": "المقررات الدراسية",
+    "gradebook": "سجل الدرجات",
+    "performance": "الأداء",
+    "latestAnnouncements": "آخر الإعلانات",
+    "announcementsDescription": "ابقَ على اطلاع بآخر التحديثات من مدرستك.",
+    "viewAll": "عرض الكل",
+    "dueQuizzes": "الاختبارات والواجبات المستحقة",
+    "dueQuizzesDescription": "الاختبارات والواجبات القادمة التي تتطلب اهتمامك.",
+    "startQuiz": "ابدأ الاختبار",
+    "solveAssignment": "حل الواجب",
+    "createNewQuizAssignment": "إنشاء اختبار/واجب جديد",
+    "yourCreatedQuizzesAssignments": "الاختبارات والواجبات التي أنشأتها",
+    "createNewAnnouncement": "إنشاء إعلان جديد",
+    "yourCreatedAnnouncements": "إعلاناتك التي أنشأتها"
+  }
+}

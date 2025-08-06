@@ -1,0 +1,38 @@
+{
+  "HomePage": {
+    "welcome": "Welcome to Anywhere Software!",
+    "tagline": "Your ultimate platform for student quizzes and announcements.",
+    "description": "Stay updated with the latest announcements and test your knowledge with interactive quizzes designed for your current semester.",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "examTimeTitle": "Exam Time",
+    "examTimeText1": "Here we are. Are you ready to fight? Don't worry, we prepared some tips to be ready for your exam.",
+    "examTimeQuote": "\"The only way to do great work is to love what you do.\"",
+    "viewExamTips": "View Exam Tips"
+  },
+  "Auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register"
+  },
+  "DashboardPage": {
+    "dashboard": "Dashboard",
+    "announcements": "Announcements",
+    "quizzes": "Quizzes",
+    "schedule": "Schedule",
+    "courses": "Courses",
+    "gradebook": "Gradebook",
+    "performance": "Performance",
+    "latestAnnouncements": "Latest Announcements",
+    "announcementsDescription": "Stay informed with the most recent updates from your school.",
+    "viewAll": "View All",
+    "dueQuizzes": "Due Quizzes & Assignments",
+    "dueQuizzesDescription": "Upcoming quizzes and assignments that require your attention.",
+    "startQuiz": "Start Quiz",
+    "solveAssignment": "Solve Assignment",
+    "createNewQuizAssignment": "Create New Quiz/Assignment",
+    "yourCreatedQuizzesAssignments": "Your Created Quizzes & Assignments",
+    "createNewAnnouncement": "Create New Announcement",
+    "yourCreatedAnnouncements": "Your Created Announcements"
+  }
+}
