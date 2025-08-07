@@ -88,4 +88,11 @@ export class AuthController {
     }
     return this.authService.refreshToken(req.user.sub, res);
   }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'Logout user' })
+  @ApiResponse({ status: 200, description: 'User logged out successfully' })
+  logout(@Res() res: Response) {
+    return this.authService.logout(res);
+  }
 }

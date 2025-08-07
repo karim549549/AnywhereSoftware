@@ -4,20 +4,26 @@ import {
   Button,
   TextField,
   List,
+  CircularProgress,
 } from "@mui/material";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema, TLoginSchema } from "@/validation/login.validation";
-import { useTranslations } from "next-intl";
-
+import { useTranslations, useLocale } from "next-intl";
+import { useState } from "react";
+import { login } from "@/apis/api";
 import PasswordValidationRule from "./PasswordValidationRule";
+import { setUser } from '@/store/userSlice';
+import { useRouter } from 'next/navigation';
+import { useAppDispatch } from '@/hooks/useAppHooks';
 
-interface LoginFormProps {
-  onSubmit: (data: TLoginSchema) => void;
-}
-
-export default function LoginForm({ onSubmit }: LoginFormProps) {
+export default function LoginForm() {
   const t = useTranslations("Auth.LoginForm");
+  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const locale = useLocale();
+
   const {
     register,
     handleSubmit,
@@ -35,6 +41,17 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
     lowercase: /[a-z]/.test(password || ""),
     uppercase: /[A-Z]/.test(password || ""),
     number: /[0-9]/.test(password || ""),
+  };
+
+  const onSubmit = async (data: TLoginSchema) => {
+    setLoading(true);
+    try {
+      const response = await login(data);
+      dispatch(setUser(response));
+      router.push(`/${locale}/dashboard`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,6 +72,7 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         {...register("email")}
         error={!!errors.email}
         helperText={errors.email?.message || ' '}
+        disabled={loading}
       />
       <TextField
         margin="normal"
@@ -67,6 +85,7 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         {...register("password")}
         error={!!errors.password}
         helperText={errors.password?.message || ' '}
+        disabled={loading}
       />
       <Box sx={{ my: 2 }}>
         <List dense>
@@ -93,8 +112,9 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         fullWidth
         variant="contained"
         sx={{ mt: 1, mb: 2 }}
+        disabled={loading}
       >
-        {t("signIn")}
+        {loading ? <CircularProgress size={24} /> : t("signIn")}
       </Button>
     </Box>
   );

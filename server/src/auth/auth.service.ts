@@ -141,4 +141,10 @@ export class AuthService {
 
     return { id: user.id, username: user.username, email: user.email };
   }
+
+  logout(res: Response) {
+    res.clearCookie(ACCESS_TOKEN_COOKIE_KEY);
+    res.clearCookie(REFRESH_TOKEN_COOKIE_KEY);
+    return { message: 'Logged out successfully' };
+  }
 }

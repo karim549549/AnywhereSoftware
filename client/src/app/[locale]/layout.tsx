@@ -5,6 +5,10 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import "../globals.css";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { Provider } from 'react-redux';
+import { store } from '@/store/store';
+import { ErrorProvider } from '@/components/providers/ErrorProvider';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,16 +40,20 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NextIntlClientProvider >
-          <ThemeProvider  
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange 
-          >
-            {children}
-          </ThemeProvider>
-        </NextIntlClientProvider>
+        <Provider store={store}>
+          <NextIntlClientProvider >
+            <ThemeProvider  
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange 
+            >
+              <ErrorProvider>
+                {children}
+              </ErrorProvider>
+            </ThemeProvider>
+          </NextIntlClientProvider>
+        </Provider>
       </body>
     </html>
   );

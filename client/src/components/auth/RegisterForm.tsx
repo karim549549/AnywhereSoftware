@@ -4,19 +4,26 @@ import {
   Button,
   TextField,
   List,
+  CircularProgress,
 } from "@mui/material";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterSchema, TRegisterSchema } from "@/validation/register.validation";
 import PasswordValidationRule from "./PasswordValidationRule";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { useState } from "react";
+import { register as registerUser } from "@/apis/api";
+import { useAppDispatch } from '@/hooks/useAppHooks';
+import { setUser } from '@/store/userSlice';
+import { useRouter } from 'next/navigation';
 
-interface RegisterFormProps {
-  onSubmit: (data: TRegisterSchema) => void;
-}
-
-export default function RegisterForm({ onSubmit }: RegisterFormProps) {
+export default function RegisterForm() {
   const t = useTranslations("Auth.RegisterForm");
+  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const locale = useLocale();
+
   const {
     register,
     handleSubmit,
@@ -34,6 +41,17 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
     lowercase: /[a-z]/.test(password || ""),
     uppercase: /[A-Z]/.test(password || ""),
     number: /[0-9]/.test(password || ""),
+  };
+
+  const onSubmit = async (data: TRegisterSchema) => {
+    setLoading(true);
+    try {
+      const response = await registerUser(data);
+      dispatch(setUser(response));
+      router.push(`/${locale}/dashboard`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,6 +72,7 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
         {...register("username")}
         error={!!errors.username}
         helperText={errors.username?.message || ' '}
+        disabled={loading}
       />
       <TextField
         margin="normal"
@@ -65,6 +84,7 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
         {...register("email")}
         error={!!errors.email}
         helperText={errors.email?.message || ' '}
+        disabled={loading}
       />
       <TextField
         margin="normal"
@@ -77,6 +97,7 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
         {...register("password")}
         error={!!errors.password}
         helperText={errors.password?.message || ' '}
+        disabled={loading}
       />
       <TextField
         margin="normal"
@@ -89,6 +110,7 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
         {...register("confirmPassword")}
         error={!!errors.confirmPassword}
         helperText={errors.confirmPassword?.message || ' '}
+        disabled={loading}
       />
       <Box sx={{ my: 2 }}>
         <List dense>
@@ -115,8 +137,9 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
         fullWidth
         variant="contained"
         sx={{ mt: 1, mb: 2 }}
+        disabled={loading}
       >
-        {t("signUp")}
+        {loading ? <CircularProgress size={24} /> : t("signUp")}
       </Button>
     </Box>
   );

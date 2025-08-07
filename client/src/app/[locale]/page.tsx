@@ -1,13 +1,11 @@
 import React from 'react'
-import { Container, Box, Typography, Button } from '@mui/material'
-import Link from "next/link";
+import { Container, Box, Typography } from '@mui/material'
 import { getTranslations } from 'next-intl/server';
+import AuthButtons from '@/components/common/AuthButtons';
 
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export default async function Home({ params }: any) {
+export default async function Home() {
   const t = await getTranslations("HomePage");
-  const { locale } = await params;
   return (
     <div className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white transition-colors duration-500">
       <Container
@@ -29,21 +27,9 @@ export default async function Home({ params }: any) {
           <Typography variant="body1" gutterBottom>
             {t("description")}
           </Typography>
-          <Box mt={4} display="flex" justifyContent="center" gap={2}>
-            <Link href={`/${locale}/auth/login`}>
-              <Button variant="contained" size="large">
-                {t("getStarted")}
-              </Button>
-            </Link>
-            <Link href={`/${locale}/auth/register`}>
-              <Button variant="outlined" size="large">
-                {t("learnMore")}
-              </Button>
-            </Link>
-          </Box>
+          <AuthButtons />
         </Box>
       </Container>
     </div>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

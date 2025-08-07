@@ -12,9 +12,18 @@ import Logo from '@/components/common/Logo';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher'; // Import LanguageSwitcher
 import ThemeSwitch from '@/components/common/ThemeSwitch'; // Import ThemeSwitch
 import SearchDialog from '@/components/common/SearchDialog'; // Import SearchDialog
+import { useAppDispatch, useAppSelector } from '@/hooks/useAppHooks';
+import { clearAuth } from '@/store/userSlice';
+import { logout } from '@/apis/api';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 
 const Navbar: React.FC = () => {
   const [isSearchDialogOpen, setSearchDialogOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user.user);
+  const router = useRouter();
+  const locale = useLocale();
 
   const handleSearchClick = () => {
     setSearchDialogOpen(true);
@@ -22,6 +31,17 @@ const Navbar: React.FC = () => {
 
   const handleSearchDialogClose = () => {
     setSearchDialogOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      dispatch(clearAuth());
+      router.push(`/${locale}/auth/login`);
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Optionally, handle error more gracefully
+    }
   };
 
   return (
@@ -44,12 +64,20 @@ const Navbar: React.FC = () => {
         <LanguageSwitcher />
 
         {/* Auth Links */}
-        <Button color="inherit" component={Link} href="/auth/login">
-          Login
-        </Button>
-        <Button color="inherit" component={Link} href="/auth/register">
-          Register
-        </Button>
+        {user ? (
+          <Button color="inherit" onClick={handleLogout}>
+            Logout
+          </Button>
+        ) : (
+          <>
+            <Button color="inherit" component={Link} href={`/${locale}/auth/login`}>
+              Login
+            </Button>
+            <Button color="inherit" component={Link} href={`/${locale}/auth/register`}>
+              Register
+            </Button>
+          </>
+        )}
       </Toolbar>
       <SearchDialog open={isSearchDialogOpen} onClose={handleSearchDialogClose} />
     </AppBar>
