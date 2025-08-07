@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.JWT_REFRESH_SECRET_KEY = exports.JWT_ACCESS_SECRET = exports.JWT_REFRESH_TOKEN_EXPIRATION_TIME_KEY = exports.JWT_ACCESS_TOKEN_EXPIRATION_TIME_KEY = exports.REFRESH_TOKEN_COOKIE_KEY = exports.ACCESS_TOKEN_COOKIE_KEY = void 0;
+exports.ACCESS_TOKEN_COOKIE_KEY = 'access_token';
+exports.REFRESH_TOKEN_COOKIE_KEY = 'refresh_token';
+exports.JWT_ACCESS_TOKEN_EXPIRATION_TIME_KEY = 'JWT_ACCESS_TOKEN_EXPIRATION_TIME';
+exports.JWT_REFRESH_TOKEN_EXPIRATION_TIME_KEY = 'JWT_REFRESH_TOKEN_EXPIRATION_TIME';
+exports.JWT_ACCESS_SECRET = 'JWT_ACCESS_SECRET';
+exports.JWT_REFRESH_SECRET_KEY = 'JWT_REFRESH_SECRET';
+//# sourceMappingURL=auth.constants.js.map
