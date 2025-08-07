@@ -1,45 +1,48 @@
 'use client';
 
-import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Typography, Button, CircularProgress, Alert } from '@mui/material';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-
-interface QuizAssignment {
-  id: string;
-  title: string;
-  dueDate: string;
-  topic: string;
-  type: 'quiz' | 'assignment' | 'exam';
-}
-
-// Placeholder for due quizzes and assignments - will be replaced by API fetch
-const dueQuizzes: QuizAssignment[] = [
-  {
-    id: 'q1',
-    title: 'Algebra I - Chapter 3 Quiz',
-    dueDate: 'Nov 15, 2025',
-    topic: 'Equations and Inequalities',
-    type: 'quiz',
-  },
-  {
-    id: 'a1',
-    title: 'History - Essay on World War II',
-    dueDate: 'Nov 18, 2025',
-    topic: 'Historical Analysis',
-    type: 'assignment',
-  },
-  {
-    id: 'q2',
-    title: 'Chemistry - Stoichiometry Exam',
-    dueDate: 'Nov 20, 2025',
-    topic: 'Chemical Reactions',
-    type: 'exam',
-  },
-];
+import { getAllQuizzes } from '@/apis/quiz.api';
+import { Quiz } from '@/types/quiz.type';
 
 const DueQuizzesAssignments: React.FC = () => {
   const tDashboard = useTranslations('DashboardPage');
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getAllQuizzes({ limit: 3, sortBy: 'createdAt', orderBy: 'desc' }); // Fetch latest 3 quizzes
+        setQuizzes(response.data);
+      }  finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuizzes();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: 'white', minHeight: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: 'white', minHeight: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: 'white', minHeight: '300px' }}>
@@ -59,21 +62,25 @@ const DueQuizzesAssignments: React.FC = () => {
         </Link>
       </Box>
       <Box>
-        {dueQuizzes.map((item) => (
-          <Box key={item.id} sx={{ mb: 2, p: 1, borderBottom: '1px solid #f0f0f0' }}>
-            <Typography variant="subtitle1" fontWeight="bold">{item.title}</Typography>
-            <Typography variant="body2" color="text.secondary">Due: {item.dueDate} | Topic: {item.topic}</Typography>
-            <Button
-              variant="contained"
-              size="small"
-              sx={{ mt: 1 }}
-              component={Link}
-              href={`/dashboard/quizzes/${item.id}`}
-            >
-              {item.type === 'quiz' || item.type === 'exam' ? tDashboard('startQuiz') : tDashboard('solveAssignment')}
-            </Button>
-          </Box>
-        ))}
+        {quizzes.length > 0 ? (
+          quizzes.map((item) => (
+            <Box key={item.id} sx={{ mb: 2, p: 1, borderBottom: '1px solid #f0f0f0' }}>
+              <Typography variant="subtitle1" fontWeight="bold">{item.title}</Typography>
+              <Typography variant="body2" color="text.secondary">Description: {item.description} | Created: {new Date(item.createdAt).toLocaleDateString()}</Typography>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ mt: 1 }}
+                component={Link}
+                href={`/dashboard/quizzes/${item.id}`}
+              >
+                View Quiz
+              </Button>
+            </Box>
+          ))
+        ) : (
+          <Typography variant="body2" color="text.secondary">No quizzes or assignments available.</Typography>
+        )}
       </Box>
     </Box>
   );

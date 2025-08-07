@@ -103,6 +103,11 @@ let AuthService = class AuthService {
         this.setAuthCookies(res, accessToken, refreshToken);
         return { id: user.id, username: user.username, email: user.email };
     }
+    logout(res) {
+        res.clearCookie(auth_constants_1.ACCESS_TOKEN_COOKIE_KEY);
+        res.clearCookie(auth_constants_1.REFRESH_TOKEN_COOKIE_KEY);
+        return { message: 'Logged out successfully' };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

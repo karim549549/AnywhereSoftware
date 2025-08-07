@@ -14,4 +14,7 @@ export declare class AuthService {
     register(registerDto: RegisterDto, res: Response): Promise<AuthResponseDto>;
     login(loginDto: LoginDto, res: Response): Promise<AuthResponseDto>;
     refreshToken(userId: string, res: Response): Promise<AuthResponseDto>;
+    logout(res: Response): {
+        message: string;
+    };
 }

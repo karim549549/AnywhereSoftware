@@ -1,14 +1,21 @@
 'use client';
 
-import React from 'react';
-import { Box, Typography, Button, TextField } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Button, TextField, CircularProgress, Alert } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { announcementSchema, AnnouncementFormValues } from '@/validation/announcement.validation';
+import { createAnnouncement } from '@/apis/announcement.api';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 
 export default function CreateAnnouncementPage() {
   const t = useTranslations('DashboardPage');
+  const router = useRouter();
+  const locale = useLocale();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm<AnnouncementFormValues>({
     resolver: zodResolver(announcementSchema),
@@ -18,9 +25,15 @@ export default function CreateAnnouncementPage() {
     },
   });
 
-  const onSubmit = (data: AnnouncementFormValues) => {
-    console.log(data);
-    // Here you would typically send the data to your backend API
+  const onSubmit = async (data: AnnouncementFormValues) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await createAnnouncement(data);
+      router.push(`/${locale}/dashboard/announcements`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -29,6 +42,8 @@ export default function CreateAnnouncementPage() {
         {t('createNewAnnouncement')}
       </Typography>
 
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
       <TextField
         label="Title"
         {...register('title')}
@@ -36,6 +51,7 @@ export default function CreateAnnouncementPage() {
         margin="normal"
         error={!!errors.title}
         helperText={errors.title?.message}
+        disabled={loading}
       />
 
       <TextField
@@ -47,10 +63,11 @@ export default function CreateAnnouncementPage() {
         rows={6}
         error={!!errors.content}
         helperText={errors.content?.message}
+        disabled={loading}
       />
 
-      <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 3 }}>
-        Create Announcement
+      <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 3 }} disabled={loading}>
+        {loading ? <CircularProgress size={24} /> : t('createAnnouncement')}
       </Button>
     </Box>
   );

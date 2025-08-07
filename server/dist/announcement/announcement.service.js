@@ -5,28 +5,80 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnnouncementService = void 0;
 const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../prisma/prisma.service");
 let AnnouncementService = class AnnouncementService {
-    create(createAnnouncementDto) {
-        return 'This action adds a new announcement';
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
-    findAll() {
-        return `This action returns all announcement`;
+    async create(createAnnouncementDto, userId) {
+        return this.prisma.announcement.create({
+            data: { ...createAnnouncementDto, userId },
+        });
     }
-    findOne(id) {
-        return `This action returns a #${id} announcement`;
+    async findAll(page = 1, limit = 10, sortBy = 'createdAt', orderBy = 'desc') {
+        const skip = (page - 1) * limit;
+        const [data, total] = await this.prisma.$transaction([
+            this.prisma.announcement.findMany({
+                skip,
+                take: limit,
+                orderBy: { [sortBy]: orderBy },
+            }),
+            this.prisma.announcement.count(),
+        ]);
+        return {
+            data,
+            total,
+            page,
+            limit,
+        };
     }
-    update(id, updateAnnouncementDto) {
-        return `This action updates a #${id} announcement`;
+    async findByUserId(userId, page = 1, limit = 10, sortBy = 'createdAt', orderBy = 'desc') {
+        const skip = (page - 1) * limit;
+        const [data, total] = await this.prisma.$transaction([
+            this.prisma.announcement.findMany({
+                where: { userId },
+                skip,
+                take: limit,
+                orderBy: { [sortBy]: orderBy },
+            }),
+            this.prisma.announcement.count({ where: { userId } }),
+        ]);
+        return {
+            data,
+            total,
+            page,
+            limit,
+        };
     }
-    remove(id) {
-        return `This action removes a #${id} announcement`;
+    async findOne(id) {
+        const announcement = await this.prisma.announcement.findUnique({
+            where: { id },
+        });
+        if (!announcement) {
+            throw new common_1.NotFoundException(`Announcement with ID ${id} not found`);
+        }
+        return announcement;
+    }
+    async update(id, updateAnnouncementDto) {
+        return this.prisma.announcement.update({
+            where: { id },
+            data: updateAnnouncementDto,
+        });
+    }
+    async remove(id) {
+        return this.prisma.announcement.delete({ where: { id } });
     }
 };
 exports.AnnouncementService = AnnouncementService;
 exports.AnnouncementService = AnnouncementService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], AnnouncementService);
 //# sourceMappingURL=announcement.service.js.map

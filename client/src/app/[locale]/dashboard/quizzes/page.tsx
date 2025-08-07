@@ -1,94 +1,73 @@
 'use client';
 
-import React from 'react';
-import { Box, Typography,TableCell ,   Table, TableBody, TableContainer, TableHead, TableRow, Paper, Button, Grid } from '@mui/material';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Box, Typography,TableCell ,   Table, TableBody, TableContainer, TableHead, TableRow, Paper, Button, Grid, CircularProgress, Alert } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import CreatedQuizCard from '@/components/dashboard/quizzes/CreatedQuizCard';
 import QuizTableRow from '@/components/dashboard/quizzes/QuizTableRow';
-
-interface QuizData {
-  id: string;
-  title: string;
-  dueDate: string;
-  topic: string;
-  type: 'quiz' | 'assignment' | 'exam';
-  status: 'Due' | 'Completed' | 'Overdue';
-}
-
-interface CreatedQuizAssignmentData {
-  id: string;
-  title: string;
-  type: 'quiz' | 'assignment' | 'exam';
-  status: 'Draft' | 'Published';
-}
-
-const mockQuizzes: QuizData[] = [
-  {
-    id: 'q1',
-    title: 'Algebra I - Chapter 3 Quiz',
-    dueDate: 'Nov 15, 2025',
-    topic: 'Equations and Inequalities',
-    type: 'quiz',
-    status: 'Due',
-  },
-  {
-    id: 'a1',
-    title: 'History - Essay on World War II',
-    dueDate: 'Nov 18, 2025',
-    topic: 'Historical Analysis',
-    type: 'assignment',
-    status: 'Due',
-  },
-  {
-    id: 'q2',
-    title: 'Chemistry - Stoichiometry Exam',
-    dueDate: 'Nov 20, 2025',
-    topic: 'Chemical Reactions',
-    type: 'exam',
-    status: 'Due',
-  },
-  {
-    id: 'q3',
-    title: 'Biology - Cell Structure Quiz',
-    dueDate: 'Oct 25, 2025',
-    topic: 'Cell Biology',
-    type: 'quiz',
-    status: 'Completed',
-  },
-  {
-    id: 'a2',
-    title: 'Literature - Poetry Analysis',
-    dueDate: 'Oct 30, 2025',
-    topic: 'Literary Criticism',
-    type: 'assignment',
-    status: 'Overdue',
-  },
-];
-
-const mockCreatedQuizzes: CreatedQuizAssignmentData[] = [
-  {
-    id: 'c1',
-    title: 'My First Created Quiz',
-    type: 'quiz',
-    status: 'Draft',
-  },
-  {
-    id: 'c2',
-    title: 'History Assignment - Chapter 1',
-    type: 'assignment',
-    status: 'Published',
-  },
-  {
-    id: 'c3',
-    title: 'Physics Exam - Electromagnetism',
-    type: 'exam',
-    status: 'Draft',
-  },
-];
+import { getAllQuizzes, deleteQuiz } from '@/apis/quiz.api';
+import { Quiz } from '@/types/quiz.type';
 
 export default function QuizzesPage() {
   const t = useTranslations('DashboardPage');
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchQuizzes = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await getAllQuizzes();
+      setQuizzes(response.data);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to fetch quizzes');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchQuizzes();
+  }, [fetchQuizzes]);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this quiz?')) {
+      return;
+    }
+    try {
+      await deleteQuiz(id);
+      fetchQuizzes(); // Re-fetch quizzes after deletion
+    }
+    catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to delete quiz');
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -114,16 +93,14 @@ export default function QuizzesPage() {
           <TableHead>
             <TableRow>
               <TableCell>Title</TableCell>
-              <TableCell align="right">Due Date</TableCell>
-              <TableCell align="right">Topic</TableCell>
-              <TableCell align="right">Type</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Action</TableCell>
+              <TableCell align="right">Description</TableCell>
+              <TableCell align="right">Created At</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockQuizzes.map((quiz) => (
-              <QuizTableRow key={quiz.id} quiz={quiz} />
+            {quizzes.map((quiz) => (
+              <QuizTableRow key={quiz.id} quiz={quiz} onDelete={handleDelete} />
             ))}
           </TableBody>
         </Table>
@@ -133,9 +110,9 @@ export default function QuizzesPage() {
         {t("yourCreatedQuizzesAssignments")}
       </Typography>
       <Grid container spacing={2}>
-        {mockCreatedQuizzes.map((item) => (
+        {quizzes.map((item) => (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.id}>
-            <CreatedQuizCard item={item} />
+            <CreatedQuizCard item={item} onDelete={handleDelete} />
           </Grid>
         ))}
       </Grid>

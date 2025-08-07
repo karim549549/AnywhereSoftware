@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ErrorState {
   message: string | null;
@@ -11,7 +11,7 @@ const initialState: ErrorState = {
 };
 
 const errorSlice = createSlice({
-  name: 'error',
+  name: "error",
   initialState,
   reducers: {
     showGlobalError: (state, action: PayloadAction<string>) => {

@@ -1,26 +1,92 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAnnouncementDto } from './dto/create-announcement.dto';
 import { UpdateAnnouncementDto } from './dto/update-announcement.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { Announcement } from './entities/announcement.entity';
+import { PaginationResponse } from '../types/pagination.type';
 
 @Injectable()
 export class AnnouncementService {
-  create(createAnnouncementDto: CreateAnnouncementDto) {
-    return 'This action adds a new announcement';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(
+    createAnnouncementDto: CreateAnnouncementDto,
+    userId: string,
+  ): Promise<Announcement> {
+    return this.prisma.announcement.create({
+      data: { ...createAnnouncementDto, userId },
+    });
   }
 
-  findAll() {
-    return `This action returns all announcement`;
+  async findAll(
+    page = 1,
+    limit = 10,
+    sortBy: string = 'createdAt',
+    orderBy: 'asc' | 'desc' = 'desc',
+  ): Promise<PaginationResponse<Announcement>> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.announcement.findMany({
+        skip,
+        take: limit,
+        orderBy: { [sortBy]: orderBy },
+      }),
+      this.prisma.announcement.count(),
+    ]);
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} announcement`;
+  async findByUserId(
+    userId: string,
+    page = 1,
+    limit = 10,
+    sortBy: string = 'createdAt',
+    orderBy: 'asc' | 'desc' = 'desc',
+  ): Promise<PaginationResponse<Announcement>> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.announcement.findMany({
+        where: { userId },
+        skip,
+        take: limit,
+        orderBy: { [sortBy]: orderBy },
+      }),
+      this.prisma.announcement.count({ where: { userId } }),
+    ]);
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
-  update(id: number, updateAnnouncementDto: UpdateAnnouncementDto) {
-    return `This action updates a #${id} announcement`;
+  async findOne(id: string): Promise<Announcement> {
+    const announcement = await this.prisma.announcement.findUnique({
+      where: { id },
+    });
+    if (!announcement) {
+      throw new NotFoundException(`Announcement with ID ${id} not found`);
+    }
+    return announcement;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} announcement`;
+  async update(
+    id: string,
+    updateAnnouncementDto: UpdateAnnouncementDto,
+  ): Promise<Announcement> {
+    return this.prisma.announcement.update({
+      where: { id },
+      data: updateAnnouncementDto,
+    });
+  }
+
+  async remove(id: string): Promise<Announcement> {
+    return this.prisma.announcement.delete({ where: { id } });
   }
 }

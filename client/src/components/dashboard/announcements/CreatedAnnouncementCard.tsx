@@ -3,19 +3,14 @@
 import React from 'react';
 import { Card, CardContent, CardActions, Typography, Button } from '@mui/material';
 import Link from 'next/link';
-
-interface CreatedAnnouncementData {
-  id: string;
-  title: string;
-  content: string;
-  status: 'Draft' | 'Published';
-}
+import { Announcement } from '@/types/announcement.type';
 
 interface CreatedAnnouncementCardProps {
-  item: CreatedAnnouncementData;
+  item: Announcement;
+  onDelete?: (id: string) => void;
 }
 
-const CreatedAnnouncementCard: React.FC<CreatedAnnouncementCardProps> = ({ item }) => {
+const CreatedAnnouncementCard: React.FC<CreatedAnnouncementCardProps> = ({ item, onDelete }) => {
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <CardContent sx={{ flexGrow: 1 }}>
@@ -26,12 +21,12 @@ const CreatedAnnouncementCard: React.FC<CreatedAnnouncementCardProps> = ({ item 
           {item.content.substring(0, 100)}...
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Status: {item.status}
+          Created At: {new Date(item.createdAt).toLocaleDateString()}
         </Typography>
       </CardContent>
       <CardActions>
         <Button size="small" component={Link} href={`/dashboard/announcements/edit/${item.id}`}>Edit</Button>
-        <Button size="small" color="error">Delete</Button>
+        <Button size="small" color="error" onClick={() => onDelete && onDelete(item.id)}>Delete</Button>
       </CardActions>
     </Card>
   );

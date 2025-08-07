@@ -5,25 +5,16 @@ import {
   Link,
   Divider,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import GoogleIcon from "@mui/icons-material/Google";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import Logo from "@/components/common/Logo";
 import RegisterForm from "@/components/auth/RegisterForm";
-import { TRegisterSchema } from "@/validation/register.validation";
 import { useTranslations } from "next-intl";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const t = useTranslations("Auth");
   const locale = useLocale();
-
-  const handleRegister = (data: TRegisterSchema) => {
-    // Simulate a successful registration
-    console.log(data);
-    router.push("/en/dashboard");
-  };
 
   return (
     <>
@@ -31,7 +22,7 @@ export default function RegisterPage() {
       <Typography component="h1" variant="h5" sx={{ mt: 2 }}>
         {t("register")}
       </Typography>
-      <RegisterForm onSubmit={handleRegister} />
+      <RegisterForm />
       <Divider sx={{ my: 2, width: "100%" }}>OR</Divider>
       <Button
         fullWidth

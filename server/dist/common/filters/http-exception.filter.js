@@ -6,25 +6,30 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HttpExceptionFilter = void 0;
+exports.AllExceptionsFilter = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
-let HttpExceptionFilter = class HttpExceptionFilter extends core_1.BaseExceptionFilter {
+let AllExceptionsFilter = class AllExceptionsFilter extends core_1.BaseExceptionFilter {
     catch(exception, host) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse();
         const request = ctx.getRequest();
-        const status = exception.getStatus();
+        const status = exception instanceof common_1.HttpException
+            ? exception.getStatus()
+            : common_1.HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = exception instanceof common_1.HttpException
+            ? exception.getResponse()
+            : 'Internal server error';
         response.status(status).json({
             statusCode: status,
             timestamp: new Date().toISOString(),
             path: request.url,
-            message: exception.message,
+            message: typeof message === 'object' ? message.message : message,
         });
     }
 };
-exports.HttpExceptionFilter = HttpExceptionFilter;
-exports.HttpExceptionFilter = HttpExceptionFilter = __decorate([
-    (0, common_1.Catch)(common_1.HttpException)
-], HttpExceptionFilter);
+exports.AllExceptionsFilter = AllExceptionsFilter;
+exports.AllExceptionsFilter = AllExceptionsFilter = __decorate([
+    (0, common_1.Catch)()
+], AllExceptionsFilter);
 //# sourceMappingURL=http-exception.filter.js.map

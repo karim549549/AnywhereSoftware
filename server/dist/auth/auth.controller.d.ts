@@ -11,4 +11,7 @@ export declare class AuthController {
     login(loginDto: LoginDto, res: Response): Promise<AuthResponseDto>;
     getMe(req: Request): JwtPayload;
     refresh(req: Request, res: Response): Promise<AuthResponseDto>;
+    logout(res: Response): {
+        message: string;
+    };
 }

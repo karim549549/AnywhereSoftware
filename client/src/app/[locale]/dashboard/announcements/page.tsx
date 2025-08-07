@@ -1,64 +1,78 @@
 'use client';
 
-import React from 'react';
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Grid  } from '@mui/material';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Grid, CircularProgress, Alert  } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import AnnouncementTableRow from '@/components/dashboard/announcements/AnnouncementTableRow';
 import CreatedAnnouncementCard from '@/components/dashboard/announcements/CreatedAnnouncementCard';
-
-interface AnnouncementData {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-}
-
-interface CreatedAnnouncementData {
-  id: string;
-  title: string;
-  content: string;
-  status: 'Draft' | 'Published';
-}
-
-const mockAnnouncements: AnnouncementData[] = [
-  {
-    id: 'a1',
-    title: 'School Holiday Announcement',
-    content: 'The school will be closed on November 20th for a national holiday. Enjoy your day off!',
-    createdAt: '2025-11-10',
-  },
-  {
-    id: 'a2',
-    title: 'Parent-Teacher Conference',
-    content: 'Parent-Teacher conferences will be held on December 5th and 6th. Please sign up for a slot online.',
-    createdAt: '2025-11-05',
-  },
-  {
-    id: 'a3',
-    title: 'New Library Hours',
-    content: 'Starting next week, the library will extend its hours until 8 PM on weekdays.',
-    createdAt: '2025-11-01',
-  },
-];
-
-const mockCreatedAnnouncements: CreatedAnnouncementData[] = [
-  {
-    id: 'ca1',
-    title: 'My Draft Announcement',
-    content: 'This is a draft announcement that I am working on.',
-    status: 'Draft',
-  },
-  {
-    id: 'ca2',
-    title: 'Published Event Notice',
-    content: 'Details about the upcoming school event.',
-    status: 'Published',
-  },
-];
+import { getAllAnnouncements, getUserAnnouncements, deleteAnnouncement } from '@/apis/announcement.api';
+import { Announcement } from '@/types/announcement.type';
+import { useAppSelector } from '@/hooks/useAppHooks';
 
 export default function AnnouncementsPage() {
   const t = useTranslations('DashboardPage');
+  const [allAnnouncements, setAllAnnouncements] = useState<Announcement[]>([]);
+  const [userAnnouncements, setUserAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const currentUser = useAppSelector((state) => state.user.user);
+
+  const fetchAnnouncements = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const allResponse = await getAllAnnouncements();
+      setAllAnnouncements(allResponse.data);
+
+      const userResponse = await getUserAnnouncements();
+      setUserAnnouncements(userResponse.data);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Failed to fetch announcements');
+      } else {
+        setError("Failed to fetch announcements");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAnnouncements();
+  }, [fetchAnnouncements]);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this announcement?')) {
+      return;
+    }
+    try {
+      await deleteAnnouncement(id);
+      fetchAnnouncements(); // Re-fetch announcements after deletion
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Failed to delete announcement');
+      } else {
+        setError('An unexpected error occurred');
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -83,8 +97,8 @@ export default function AnnouncementsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockAnnouncements.map((announcement) => (
-              <AnnouncementTableRow key={announcement.id} announcement={announcement} isOwner={false} />
+            {allAnnouncements.map((announcement) => (
+              <AnnouncementTableRow key={announcement.id} announcement={announcement} isOwner={announcement.userId === currentUser?.id} onDelete={handleDelete} />
             ))}
           </TableBody>
         </Table>
@@ -94,9 +108,9 @@ export default function AnnouncementsPage() {
         {t('yourCreatedAnnouncements')}
       </Typography>
       <Grid container spacing={2}>
-        {mockCreatedAnnouncements.map((item) => (
+        {userAnnouncements.map((item) => (
           <Grid size={{ xs: 12, sm: 6 , md: 4}} key={item.id}>
-            <CreatedAnnouncementCard item={item} />
+            <CreatedAnnouncementCard item={item} onDelete={handleDelete} />
           </Grid>
         ))}
       </Grid>

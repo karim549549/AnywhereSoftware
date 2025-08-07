@@ -10,11 +10,13 @@ exports.AnnouncementModule = void 0;
 const common_1 = require("@nestjs/common");
 const announcement_service_1 = require("./announcement.service");
 const announcement_controller_1 = require("./announcement.controller");
+const prisma_module_1 = require("../prisma/prisma.module");
 let AnnouncementModule = class AnnouncementModule {
 };
 exports.AnnouncementModule = AnnouncementModule;
 exports.AnnouncementModule = AnnouncementModule = __decorate([
     (0, common_1.Module)({
+        imports: [prisma_module_1.PrismaModule],
         controllers: [announcement_controller_1.AnnouncementController],
         providers: [announcement_service_1.AnnouncementService],
     })
